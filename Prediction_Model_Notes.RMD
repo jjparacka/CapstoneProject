@@ -1,0 +1,127 @@
+---
+title: 'Capstone Project : Word Prediction Performance'
+author: "Jacob Paracka"
+date: "March 16, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prediction accuracy and performance for models 
+A sample of 20 tweets and 20 blogs are selected for performance and accuracy measurement. Using each sentence from the tweet and blogs a prediction is made for the last word of the sentence. This prediction(s) are compared to the actual word from the sentence to measure the accuracy. 
+
+We try out different models to find the right combination for accuracy and performance. 
+
+## Baseline prediction 
+The base line prediction is just using the most common words "The", "on" and "a" as the predictions. The developed model should have significantly higher accuracy than this. 
+
+Overall top-3 score:     5.48 %
+Overall top-1 precision: 4.28 %
+Overall top-3 precision: 7.25 %
+Average runtime:         0.05 msec
+Number of predictions:   775
+Total memory used:       2399.84 MB
+
+##Model 1 : using full set of 6-grams to 1-grams for prediction 
+Overall top-3 score:     16.58 %
+Overall top-1 precision: 13.30 %
+Overall top-3 precision: 19.37 %
+Average runtime:         1385.30 msec
+Number of predictions:   775
+Total memory used:       2399.84 MB
+
+##Model 2 : using full set of 5-grams to 1-grams for prediction
+Overall top-3 score:     16.62 %
+Overall top-1 precision: 13.42 %
+Overall top-3 precision: 19.37 %
+Average runtime:         977.99 msec
+Number of predictions:   775
+Total memory used:       1621.53 MB
+
+##Model 3 : using full set of 4-grams to 1-grams for prediction 
+Overall top-3 score:     16.86 %
+Overall top-1 precision: 13.84 %
+Overall top-3 precision: 19.51 %
+Average runtime:         600.98 msec
+Number of predictions:   775
+Total memory used:       953.26 MB
+
+##Model 4 : using full set of 3-grams to 1-grams for prediction 
+Overall top-3 score:     16.68 %
+Overall top-1 precision: 13.60 %
+Overall top-3 precision: 19.63 %
+Average runtime:         208.97 msec
+Number of predictions:   775
+Total memory used:       432.72 MB
+
+##Model 4.1 : using full set of 2-grams to 1-grams for prediction 
+Overall top-3 score:     15.79 %
+Overall top-1 precision: 12.02 %
+Overall top-3 precision: 19.07 %
+Average runtime:         36.63 msec
+Number of predictions:   775
+Total memory used:       121.94 MB
+
+
+
+##Model 5 : using top 20 set of 6-grams to 1-grams for prediction 
+
+##Model 6 : using top 20 set of 5-grams to 1-grams for prediction 
+Overall top-3 score:     17.38 %
+Overall top-1 precision: 14.42 %
+Overall top-3 precision: 19.67 %
+Average runtime:         43.90 msec
+Number of predictions:   775
+Total memory used:       299.24 MB
+
+##Model 7 : using top 20 set of 4-grams to 1-grams for prediction 
+Overall top-3 score:     17.38 %
+Overall top-1 precision: 14.42 %
+Overall top-3 precision: 19.67 %
+Average runtime:         41.07 msec
+Number of predictions:   775
+Total memory used:       215.97 MB
+
+##Model 8 : using top 20 set of 3-grams to 1-grams for prediction 
+Overall top-3 score:     17.06 %
+Overall top-1 precision: 13.78 %
+Overall top-3 precision: 19.77 %
+Average runtime:         23.78 msec
+Number of predictions:   775
+Total memory used:       153.64 MB
+
+##Model 9 : using top 20 set of 2-grams to 1-grams for prediction 
+Overall top-3 score:     15.53 %
+Overall top-1 precision: 11.88 %
+Overall top-3 precision: 18.69 %
+Average runtime:         11.77 msec
+Number of predictions:   775
+Total memory used:       91.62 MB
+
+
+
+
+
+
+
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
