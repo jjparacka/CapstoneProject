@@ -1,6 +1,7 @@
 ##install.packages('shiny')
 library(shiny)
 library(markdown)
+
 shinyUI(
   
   navbarPage("Word Prediction Model",
@@ -77,8 +78,14 @@ shinyUI(
                       
                                
              ),
-             tabPanel("Notes",
-             includeMarkdown("Prediction_Model_Notes.RMD")
+             tabPanel("Documentation",
+                      fluidPage(
+                        fluidRow(
+                          column(12, includeHTML("Prediction_Model_Notes.html"))
+                        )
+                      ) 
+                              
+             
              )
   )
   

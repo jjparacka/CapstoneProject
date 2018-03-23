@@ -1,127 +1,93 @@
 ---
-title: 'Capstone Project : Word Prediction Performance'
+title: 'Capstone Project : Word Prediction Model'
 author: "Jacob Paracka"
 date: "March 16, 2018"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+##Introduction
+- The objective of the project is to build a word prediction model that will aid typing by predicting the most probable next words based on the previous words/phrases entered. This is the final delivery for Coursera's Data Science Specialization: Swiftkey Capstone Project
+- The prediction model is developed based on a data set consisting of blogs, news articles and tweets
+- A web based application is developed (Shiny io), that reads an input from the user that uses the model to predict the three most probable next words. 
+- The application is designed to enable users to easily select the predicted words and complete the sentence 
+- Special emphasis is made to tune the model for optimum memory utilization and accuracy. Some trade-offs are mode so that the application is light and fast.
+
+##Model building - Highlights
+
+The model if built from a samples of 200,000 blogs, news and tweets each. The sample size was selected to get as much data which could be processed in a reasonable time period.
+
+Step 1 Data Cleaning and preprocessing 
+
+- remove all punctuations
+- conver to all lower case 
+- remove special characters and empty space 
+- remove profanity 
+
+Step2 Building NGrams
+
+- use the quanteda package to build NGrams with lengths 1 to 6 
+- get the count of each NGram in the data and arrange them by frequency 
+
+Step3: Algorithm 
+
+- The last N-1 words from the input is matched with the initial N-1 words in the NGram. If a match is found , the last word in the NGram is the prediction. The frequency of that NGram is the weightage of the prediction
+- The matching is done starting from the 6Grams to the 2Grams. Matches from longer NGrams are given higher weightage
+- Next word prediction is triggered when the user inputs a space, indicating the end of the previous word. While a word is being typed, the application looks up the uni-gram for suggestions of the current word.
+
+#Model Performance Tuining
+
+Using NGrams of lenghts 6 and 5 proved to use high memory andn was not very responsive. Also noticed that a large part of these Ngrams were single occurances. Exploratory analysis showed that theses are a result of errors in spelling or incorrect usage of words. 
+
+Possible tuining approaches 
+
+- Change number of NGrams used in prediction
+- Optimize single occurance NGams (the long tail) 
+
+A preformance measurement for the prediction was done with various combination of NGrams. The results are below. 
+
+```{r modelperformance, echo=FALSE}
+require(ggplot2)
+modelid <- c("model1","model2","model3","model4","model5","model6","model7","model8","model9")
+Accuracy <- c(16.58, 16.62, 16.82, 16.68, 15.79, 17.38, 17.38, 17.06, 15.53)
+Memory <- c(2399.84,1621.53,953.26, 432.72, 121.94,299.24, 215.97,153.64,91.62    )
+d<- data.frame(modelid, Accuracy, Memory, stringsAsFactors = FALSE)
+d$Modeldesc <- 
+  c(
+    "Model 1: use full set of 6-grams to 1-grams for prediction" ,
+    "Model 2: use full set of 5-grams to 1-grams for prediction" ,
+    "Model 3: use full set of 4-grams to 1-grams for prediction" ,
+    "Model 4: use full set of 3-grams to 1-grams for prediction" ,
+    "Model 5: use full set of 2-grams to 1-grams for prediction" ,
+    "Model 6: using top 20 of 5-grams to 1-grams for prediction" ,
+    "Model 7: using top 20 of 4-grams to 1-grams for prediction" ,
+    "Model 8: using top 20 of 3-grams to 1-grams for prediction" ,
+    "Model 9: using top 20 of 2-grams to 1-grams for prediction" 
+  )
+
+d<- d[order(d$Memory),]
+
+ggplot(d, aes(Modeldesc)) + 
+  geom_line(aes(y = Memory, colour = "Memory", group=1)) + 
+  geom_line(aes(y = Accuracy*100, colour = "Accuracy" , group=1))+ 
+  scale_y_continuous(sec.axis = sec_axis(~ ./100, name = "Accuracy%")) + 
+  geom_vline(xintercept = 7) + 
+  theme(axis.text.x = element_text(angle = 70, hjust = 1))
 ```
 
-## Prediction accuracy and performance for models 
-A sample of 20 tweets and 20 blogs are selected for performance and accuracy measurement. Using each sentence from the tweet and blogs a prediction is made for the last word of the sentence. This prediction(s) are compared to the actual word from the sentence to measure the accuracy. 
+In favor of performance the following changes were made to the model
+- user only QuadGram, TriGram and BiGrams for prediction 
+- For each N-1 group of words, use only the top 20 rows in the NGrams.
+- Remove Single occurance NGrams
+The prediction accuracy was not impacted by these changes. 
 
-We try out different models to find the right combination for accuracy and performance. 
+#Word Predition Application 
+The application is designed to take the user input and provides the top 3 predictions. 
+User can select the predicted words by clicking on the corresponding buttons. Thus reducing the number of key strokes needed to complete the sentence. 
+Application also has a current word predictions capability based on a partial word input
+A word cloud of the top 2- predictions is also displayed as suggestions beyond the top3 
 
-## Baseline prediction 
-The base line prediction is just using the most common words "The", "on" and "a" as the predictions. The developed model should have significantly higher accuracy than this. 
+# Conclusion
 
-Overall top-3 score:     5.48 %
-Overall top-1 precision: 4.28 %
-Overall top-3 precision: 7.25 %
-Average runtime:         0.05 msec
-Number of predictions:   775
-Total memory used:       2399.84 MB
-
-##Model 1 : using full set of 6-grams to 1-grams for prediction 
-Overall top-3 score:     16.58 %
-Overall top-1 precision: 13.30 %
-Overall top-3 precision: 19.37 %
-Average runtime:         1385.30 msec
-Number of predictions:   775
-Total memory used:       2399.84 MB
-
-##Model 2 : using full set of 5-grams to 1-grams for prediction
-Overall top-3 score:     16.62 %
-Overall top-1 precision: 13.42 %
-Overall top-3 precision: 19.37 %
-Average runtime:         977.99 msec
-Number of predictions:   775
-Total memory used:       1621.53 MB
-
-##Model 3 : using full set of 4-grams to 1-grams for prediction 
-Overall top-3 score:     16.86 %
-Overall top-1 precision: 13.84 %
-Overall top-3 precision: 19.51 %
-Average runtime:         600.98 msec
-Number of predictions:   775
-Total memory used:       953.26 MB
-
-##Model 4 : using full set of 3-grams to 1-grams for prediction 
-Overall top-3 score:     16.68 %
-Overall top-1 precision: 13.60 %
-Overall top-3 precision: 19.63 %
-Average runtime:         208.97 msec
-Number of predictions:   775
-Total memory used:       432.72 MB
-
-##Model 4.1 : using full set of 2-grams to 1-grams for prediction 
-Overall top-3 score:     15.79 %
-Overall top-1 precision: 12.02 %
-Overall top-3 precision: 19.07 %
-Average runtime:         36.63 msec
-Number of predictions:   775
-Total memory used:       121.94 MB
-
-
-
-##Model 5 : using top 20 set of 6-grams to 1-grams for prediction 
-
-##Model 6 : using top 20 set of 5-grams to 1-grams for prediction 
-Overall top-3 score:     17.38 %
-Overall top-1 precision: 14.42 %
-Overall top-3 precision: 19.67 %
-Average runtime:         43.90 msec
-Number of predictions:   775
-Total memory used:       299.24 MB
-
-##Model 7 : using top 20 set of 4-grams to 1-grams for prediction 
-Overall top-3 score:     17.38 %
-Overall top-1 precision: 14.42 %
-Overall top-3 precision: 19.67 %
-Average runtime:         41.07 msec
-Number of predictions:   775
-Total memory used:       215.97 MB
-
-##Model 8 : using top 20 set of 3-grams to 1-grams for prediction 
-Overall top-3 score:     17.06 %
-Overall top-1 precision: 13.78 %
-Overall top-3 precision: 19.77 %
-Average runtime:         23.78 msec
-Number of predictions:   775
-Total memory used:       153.64 MB
-
-##Model 9 : using top 20 set of 2-grams to 1-grams for prediction 
-Overall top-3 score:     15.53 %
-Overall top-1 precision: 11.88 %
-Overall top-3 precision: 18.69 %
-Average runtime:         11.77 msec
-Number of predictions:   775
-Total memory used:       91.62 MB
-
-
-
-
-
-
-
-
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+- Using a small data set and a simple algorithm a relatively good prediction model could be developed.
+- The shiny framework provides and very easy way to build applications
+- This project was definitely a great hands on experience in data science.
